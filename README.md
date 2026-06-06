@@ -34,3 +34,5 @@ State Management:
 npm install
 
 npm run dev
+
+LIVE DEPLOYMENT: https://ecell-web.netlify.app/
