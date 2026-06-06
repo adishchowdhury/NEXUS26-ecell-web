@@ -7,8 +7,8 @@ export default function Footer() {
             HackIE<span className="text-electric align-super text-xs">3</span>
           </span>
           <div className="font-sans text-xs text-white/40 tracking-widest uppercase text-center md:text-left space-y-1 mt-1">
-            <p>© 2026 Infinity Systems. All rights reserved.</p>
-            <p className="text-white/60">Created with &lt;3 by Adrija Chowdhury</p>
+            <p>© 2026 Adrija Chowdhury. All rights reserved.</p>
+            <p className="text-white/60">Created with <3 by Adrija Chowdhury</p>
           </div>
         </div>
         
