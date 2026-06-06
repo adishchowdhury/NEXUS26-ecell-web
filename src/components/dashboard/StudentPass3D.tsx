@@ -4,7 +4,7 @@ import { QrCode, Zap } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 export function StudentPass3D() {
-  const cardRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null):
   const [rotateX, setRotateX] = useState(0);
   const [rotateY, setRotateY] = useState(0);
   const [glarePosition, setGlarePosition] = useState({ x: 50, y: 50 });
