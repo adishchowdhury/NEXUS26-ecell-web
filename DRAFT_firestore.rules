@@ -1,0 +1,70 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() { return request.auth != null; }
+    function existing() { return resource.data; }
+    function incoming() { return request.resource.data; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    function isVerifiedEmail() { return request.auth.token.email_verified == true; }
+
+    // Validation functions
+    function isValidUser(data) {
+      return data.keys().hasAll(['email', 'createdAt']) && 
+             data.email is string && data.email.size() <= 200 &&
+             data.createdAt == request.time;
+    }
+
+    function isValidOrder(data) {
+      return data.keys().hasAll(['userId', 'items', 'totalAmount', 'status', 'createdAt']) &&
+             data.userId == request.auth.uid &&
+             data.items is list && data.items.size() > 0 && data.items.size() <= 100 &&
+             data.totalAmount is number &&
+             data.status in ['pending', 'completed'] &&
+             data.createdAt == request.time;
+    }
+
+    function isValidPass(data) {
+      return data.keys().hasAll(['userId', 'passId', 'name', 'type', 'createdAt']) &&
+             data.userId == request.auth.uid &&
+             data.passId is string && data.passId.size() <= 100 &&
+             data.name is string && data.name.size() <= 100 &&
+             data.type is string && data.type.size() <= 50 &&
+             data.createdAt == request.time;
+    }
+
+    // Collections
+    match /users/{userId} {
+      allow read: if isSignedIn() && request.auth.uid == userId;
+      allow create: if isSignedIn() && request.auth.uid == userId && isValidUser(incoming());
+      // Updates allowed for basic fields, strictly controlling structure
+      allow update: if isSignedIn() && request.auth.uid == userId && 
+                    incoming().diff(existing()).affectedKeys().hasOnly(['displayName']) &&
+                    incoming().displayName is string && incoming().displayName.size() <= 100;
+    }
+
+    match /orders/{orderId} {
+      // Only owner can read
+      allow read: if isSignedIn() && existing().userId == request.auth.uid;
+      // Only owner can list
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      // Creation
+      allow create: if isSignedIn() && isValidId(orderId) && isValidOrder(incoming()) && exists(/databases/$(database)/documents/users/$(request.auth.uid));
+      // No updates for simplicity
+    }
+
+    match /passes/{passId} {
+      // Only owner can read
+      allow read: if isSignedIn() && existing().userId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      // Creation
+      allow create: if isSignedIn() && isValidId(passId) && isValidPass(incoming()) && exists(/databases/$(database)/documents/users/$(request.auth.uid));
+      // No updates
+    }
+  }
+}

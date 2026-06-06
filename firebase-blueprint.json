@@ -1,0 +1,83 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "A registered user.",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        }
+      },
+      "required": ["email", "createdAt"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "A merchandise order.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "items": {
+          "type": "array",
+          "description": "List of cart items"
+        },
+        "totalAmount": {
+          "type": "number"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "completed"]
+        },
+        "createdAt": {
+          "type": "string"
+        }
+      },
+      "required": ["userId", "items", "totalAmount", "status", "createdAt"]
+    },
+    "Pass": {
+      "title": "Pass",
+      "description": "A generated student pass",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "passId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        }
+      },
+      "required": ["userId", "passId", "name", "type", "createdAt"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "User",
+      "description": "User profiles"
+    },
+    "orders/{orderId}": {
+      "schema": "Order",
+      "description": "User orders"
+    },
+    "passes/{passId}": {
+      "schema": "Pass",
+      "description": "Generated passes"
+    }
+  }
+}
